@@ -6,6 +6,7 @@ Pipeline
 3. qc อีกรอบ ซึ่งไม่มีปัญหา 
 
 ต่อไป หลังจาก check ข้อมูล เรา จะ STAR(Spliced Transcripts Alignment to a Reference) กัน
+1.
 1.Download genome + annotation เพื่อ เอา reads จาก FASTQ ของเราไปเทียบ ว่า แต่ละตัวมาจากตำแหน่งไหนในจีโนม (ลายละเอียดอยู่ใน foder Download genome + annotation)
 2.build genome index มันคือการ จัดระเบียบ genome ใหม่เพื่อ ให้ค้นหาได้เร็ว
 
