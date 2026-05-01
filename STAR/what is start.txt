@@ -1,0 +1,4 @@
+STAR = Spliced Transcripts Alignment to a Reference
+เป็น tool สำหรับ align RNA-seq 
+Align คืออะไร 
+Align คือการจับคู่ reads กลับไปยังตำแหน่งในจีโนม
