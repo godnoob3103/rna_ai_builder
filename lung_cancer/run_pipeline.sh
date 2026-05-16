@@ -13,15 +13,18 @@ mkdir -p "$COUNTS"
 
 process_sample() {
     local sample=$1      # uppercase SRR ID, e.g. SRR24166342
-    local label=$2       # tumor or normal
+    local label=$2       # tumor or normal (used for output dirs)
     local sample_lower=$(echo "$sample" | tr '[:upper:]' '[:lower:]')
+    # map output label to actual input folder name
+    local src_folder=$label
+    if [ "$label" = "tumor" ]; then src_folder="cancer"; fi
 
     echo "===== Processing $sample ($label) ====="
 
     # Trim
     fastp \
-        -i "$DATA/$label/${sample_lower}_1.fastq.gz" \
-        -I "$DATA/$label/${sample_lower}_2.fastq.gz" \
+        -i "$DATA/$src_folder/${sample_lower}_1.fastq.gz" \
+        -I "$DATA/$src_folder/${sample_lower}_2.fastq.gz" \
         -o "$TRIMMED/$label/${sample}_1.fastq.gz" \
         -O "$TRIMMED/$label/${sample}_2.fastq.gz" \
         -h "$TRIMMED/$label/${sample}_report.html" \
