@@ -79,6 +79,12 @@ new_combined = pd.concat(new_dfs, axis=1)   # exons x samples
 new_matrix = new_combined.T                  # samples x exons
 new_matrix.index.name = old_matrix.index.name
 
+# Normalise MultiIndex column types to strings so old (CSV-read) and new match
+new_matrix.columns = pd.MultiIndex.from_tuples(
+    [tuple(str(v) for v in col) for col in new_matrix.columns],
+    names=new_matrix.columns.names
+)
+
 # Align columns: keep only exons present in both
 shared_exons = old_matrix.columns.intersection(new_matrix.columns)
 print(f"  Shared exons: {len(shared_exons):,} / {len(old_matrix.columns):,} (old) / {len(new_matrix.columns):,} (new)")
