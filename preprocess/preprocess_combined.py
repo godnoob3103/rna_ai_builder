@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np # อันนี้ cluster เพื่อดู batch ffect (ERR + SRR)
 import pandas as pd
 import matplotlib.pyplot as plt
 
