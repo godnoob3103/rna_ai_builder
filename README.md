@@ -61,8 +61,9 @@ rna_ai_builder/
 ├── 08_preprocess/            # Script feature selection
 ├── 09_train/                 # Script train model
 ├── 10_result/                # รูปผลลัพธ์ (confusion matrix, ROC)
-├── lung_cancer/              # Pipeline script รวมสำหรับทุก sample
-└── run_pipeline.sh           # Script หลักที่รัน trim+align+count ครบวงจร
+└── pipeline/                 # Pipeline scripts (trim → align → count)
+    ├── run_ERR_dataset.sh    #   ERR164xxx — 10 cancer + 12 non_cancer
+    └── run_SRR_dataset.sh    #   SRR24166xxx — 50 tumor + 50 normal
 ```
 
 ---
@@ -222,13 +223,11 @@ python3 09_train/train_model_combined.py
 `run_pipeline.sh` รวม trim + align + count ไว้ในสคริปต์เดียว รองรับทุก sample
 
 ```bash
-bash run_pipeline.sh
-```
+# ERR dataset (10 cancer + 12 non_cancer)
+bash pipeline/run_ERR_dataset.sh
 
-สำหรับ lung cancer dataset เฉพาะ:
-
-```bash
-bash lung_cancer/run_pipeline.sh
+# SRR dataset (50 tumor + 50 normal)
+bash pipeline/run_SRR_dataset.sh
 ```
 
 ---
