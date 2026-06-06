@@ -50,17 +50,18 @@ Result: Confusion Matrix + ROC Curve  (result/)
 
 ```
 rna_ai_builder/
-├── 00_download_fastq/        # วิธี download ข้อมูล FASTQ
+├── 00_download_fastq/        # วิธี download ข้อมูล FASTQ และ script ดาวน์โหลด (script.ps1)
 ├── 01_download_reference/    # Script download genome + GTF annotation
 ├── 02_qc_before_trim/        # ผล FastQC ก่อน trim
 ├── 03_trim/                  # Script และผล trimming (fastp)
 ├── 04_qc_after_trim/         # ผล FastQC หลัง trim
 ├── 05_align/                 # Script build genome index และ align (STAR)
-├── 06_count_exons/           # Script count exons (featureCounts)
-├── 07_merge_matrix/          # Script merge count files เป็น matrix
-├── 08_preprocess/            # Script feature selection
-├── 09_train/                 # Script train model
-├── 10_result/                # รูปผลลัพธ์ (confusion matrix, ROC)
+├── 06_count_exons/           # Script count exons (exon_level_count.sh)
+├── 07_merge_matrix/          # Script merge count files เป็น matrix (merge_to_matrix.py และ merge_combined.py)
+├── 08_eda/                   # การวิเคราะห์ข้อมูลเชิงสำรวจ (Exploratory Data Analysis) และผลภาพวาดความสัมพันธ์
+├── 09_preprocess/            # Script feature selection (preprocess.py และ preprocess_combined.py)
+├── 10_train/                 # Script เทรนโมเดล (มีทั้งโมเดลแบบ ComBat, Data Leakage correction, Y-Scrambling, error analysis และ deep learning)
+├── 11_result/                # สรุปและรายงานผลลัพธ์ทั้งหมด พร้อมรายงานและข้อมูลการวิเคราะห์เชิงลึก
 └── pipeline/                 # Pipeline scripts (trim → align → count)
     ├── run_ERR_dataset.sh    #   ERR164xxx — 10 cancer + 12 non_cancer
     └── run_SRR_dataset.sh    #   SRR24166xxx — 50 tumor + 50 normal
@@ -71,7 +72,7 @@ rna_ai_builder/
 ## รายละเอียดแต่ละขั้นตอน
 
 ### Step 1 — QC ก่อน Trim
-**โฟลเดอร์:** `qc1/`  
+**โฟลเดอร์:** `02_qc_before_trim/`  
 ใช้ **FastQC** ตรวจสอบคุณภาพ raw reads เพื่อดูว่ามี adapter contamination หรือ quality ต่ำตรงไหน
 
 ```bash
@@ -81,7 +82,7 @@ bash 02_qc_before_trim/run_fast.sh
 ---
 
 ### Step 2 — Trim Adapter + Low-quality Bases
-**โฟลเดอร์:** `trim/`  
+**โฟลเดอร์:** `03_trim/`  
 ใช้ **fastp** ตัด adapter และ bases คุณภาพต่ำออก
 
 ```bash
@@ -93,7 +94,7 @@ bash 03_trim/trim.sh
 ---
 
 ### Step 3 — QC หลัง Trim
-**โฟลเดอร์:** `qc2/`  
+**โฟลเดอร์:** `04_qc_after_trim/`  
 รัน FastQC อีกครั้งหลัง trim เพื่อยืนยันว่าข้อมูลสะอาดแล้ว
 
 ```bash
@@ -103,7 +104,7 @@ bash 04_qc_after_trim/run_fast.sh
 ---
 
 ### Step 4 — Download Genome + Annotation
-**โฟลเดอร์:** `Download genome + annotation/`
+**โฟลเดอร์:** `01_download_reference/`
 
 | ไฟล์ | คืออะไร |
 |------|---------|
@@ -120,7 +121,7 @@ bash 01_download_reference/unzip.sh
 ---
 
 ### Step 5 — Build Genome Index
-**โฟลเดอร์:** `STAR/`  
+**โฟลเดอร์:** `05_align/`  
 จัดระเบียบ genome ใหม่เพื่อให้ STAR ค้นหาได้เร็ว (ทำครั้งเดียว)
 
 ```bash
@@ -130,7 +131,7 @@ bash 05_align/build_genome_index.sh
 ---
 
 ### Step 6 — Align Reads → Genome
-**โฟลเดอร์:** `STAR/`  
+**โฟลเดอร์:** `05_align/`  
 ใช้ **STAR** (Spliced Transcripts Alignment to a Reference) จับคู่ reads กลับไปยังตำแหน่งในจีโนม ผลลัพธ์คือไฟล์ BAM
 
 ```bash
@@ -140,81 +141,88 @@ bash 05_align/Align.sh
 ---
 
 ### Step 7 — Count Exons
-**โฟลเดอร์:** `exon x samples/`  
+**โฟลเดอร์:** `06_count_exons/`  
 ใช้ **featureCounts** นับจำนวน reads ที่ตกในแต่ละ exon ของแต่ละ sample
 
 ```bash
-bash "06_count_exons/exon-level count.sh"
+bash 06_count_exons/exon_level_count.sh
 ```
 
 ---
 
 ### Step 8 — Merge เป็น Matrix
-**โฟลเดอร์:** `matrix/`  
+**โฟลเดอร์:** `07_merge_matrix/`  
 รวม count files ของทุก sample เข้าเป็นตาราง (exons × samples)
 
 ```bash
 # SRR samples เดี่ยว
 python3 07_merge_matrix/merge_to_matrix.py
 
-# SRR + ERR รวมกัน
+# SRR + ERR รวมกัน (ด้วยวิธี streaming merge ที่ประหยัดแรม)
 python3 07_merge_matrix/merge_combined.py
 ```
 
 ---
 
-### Step 9 — Preprocess + Feature Selection
-**โฟลเดอร์:** `preprocess/`  
-ตอนนี้มี ~2,164,410 features (exons) ซึ่งเยอะเกินไป จึงทำ feature selection 3 ขั้น:
-
-| ขั้นตอน | วิธี | ผล |
-|---------|------|----|
-| 1. Filter | เอา exon ที่มี count > 0 ใน ≥10% ของ samples ออกมา | ลด noise |
-| 2. Normalize | log1p transform | สเกลข้อมูลไม่ต่างกันมากเกินไป |
-| 3. Select | top 5,000 exons by variance | เหลือ features ที่มีประโยชน์ |
+### Step 8b — Exploratory Data Analysis (EDA)
+**โฟลเดอร์:** `08_eda/`  
+วิเคราะห์ข้อมูลเชิงสำรวจ เช่น การกระจายตัวของคลาส ขนาดไลบรารี สัดส่วนค่าศูนย์ ความสัมพันธ์ระหว่างค่าเฉลี่ยและความแปรปรวน และการกระจายตัวหลังทำ ComBat batch correction
 
 ```bash
-# SRR เดี่ยว
-python3 08_preprocess/preprocess.py
+python3 08_eda/run_eda.py
+```
+*อ่านรายงาน EDA ได้ใน [eda_report.md](file:///mnt/c/Users/User/OneDrive/Documents/GitHub/rna_ai_builder/08_eda/eda_report.md)*
 
-# SRR + ERR
-python3 08_preprocess/preprocess_combined.py
+---
+
+### Step 9 — Preprocess + Feature Selection
+**โฟลเดอร์:** `09_preprocess/`  
+คัดเลือก exons เด่นจาก 2 ล้านกว่าตัวให้เหลือ 5,000 ตัวที่มีความแปรปรวนสูงและมีค่า count ที่เชื่อถือได้
+
+```bash
+# สำหรับ SRR เดี่ยว
+python3 09_preprocess/preprocess.py
+
+# สำหรับ SRR + ERR
+python3 09_preprocess/preprocess_combined.py
 ```
 
 ---
 
 ### Step 10 — Train ML Model
-**โฟลเดอร์:** `train/`  
-Train 3 models พร้อมกัน: **Random Forest**, **XGBoost**, **SVM**  
-เลือก 3 models ที่มีวิธีคิดต่างกัน — ถ้าทั้ง 3 ตัวให้ผลใกล้กัน แสดงว่าไม่ใช่ความบังเอิญ
-
-**ขั้นตอน:**
-1. Train เฉพาะ SRR samples ก่อน (ข้อมูลเยอะกว่า)
-2. Cluster ERR + SRR เพื่อหา batch effect → พบว่าผลค่อนข้างแย่
-3. แก้ด้วย **ComBat** (batch correction)
-4. Train model รวม ERR + SRR + ComBat แล้วเปรียบเทียบกับ SRR เดียว
+**โฟลเดอร์:** `10_train/`  
+การเปรียบเทียบเชิงวิจัย 4 เฟสเพื่อสร้างโมเดลที่มีประสิทธิภาพสูงสุดและป้องกันปัญหา Data Leakage
 
 ```bash
-# SRR เดี่ยว
-python3 "09_train/train_model(only_srr).py"
+# เทรนเฉพาะ SRR เดี่ยว
+python3 10_train/train_model_only_srr.py
 
-# SRR + ERR + ComBat
-python3 09_train/train_model_combined.py
+# เทรนโมเดลเปรียบเทียบ SRR vs SRR+ERR แบบมี ComBat
+python3 10_train/train_model_combined.py
 ```
 
-> ผลต่างกันแค่ ±2% → batch correction ได้ผล
+#### 📅 เส้นทางการวิจัยและทดลอง (4 เฟส)
+1. **Phase 1: Global Setup** - ทำ ComBat ปรับสเกลข้อมูลทั้งหมดพร้อมกัน ได้ผลประเมิน Rule 2 แม่นยำสูงลิ่วถึง **98.04%**
+2. **Phase 2: Leakage Fix** - พบ Data Leakage ในการปรับสเกล จึงออกแบบ ComBat-CV แยกฟิตเฉพาะข้อมูลในลูป Train (`error_analysis_complete.py`) ส่งผลให้ความแม่นยำ Rule 2 ตกลงมาเหลือ **86.41%** ในขณะที่โมเดล **SVM (RBF) - 3 Exons** นำด้วยความแม่นยำคงที่ **96.12%**
+3. **Phase 3: Y-Scrambling** - ทำการประเมินความนัยสำคัญของผลลัพธ์ (`y_scrambling_leakfree.py`) ได้ Empirical P-value = **0.0196** ยืนยันว่าโมเดลเรียนรู้จากสัญญาณทางชีวภาพจริงที่ปลอดภัยจาก Data Leakage
+4. **Phase 4: Raw Evaluation** - รันโมเดลบนข้อมูลดิบที่ไม่ผ่าน Combat เลย (`y_scrambling_nocombat.py`) พบว่า **SVM (RBF) - 3 Exons** ได้ผลลัพธ์เสถียรที่ **96.12%** เช่นเดิม ทำให้ได้โมเดลแนะนำสำหรับใช้งานทางคลินิก (Inference รวดเร็วแบบไม่ต้องมี ComBat)
+
+*อ่านบันทึกประวัติการทดลองได้ใน [experimental_timeline.md](file:///mnt/c/Users/User/OneDrive/Documents/GitHub/rna_ai_builder/11_result/experimental_timeline.md)*
 
 ---
 
 ## ผลลัพธ์
-**โฟลเดอร์:** `result/`
+**โฟลเดอร์:** `11_result/`
 
 | ไฟล์ | คืออะไร |
 |------|---------|
-| `10_result/confusion_matrices.png` | Confusion matrix (SRR only) |
-| `10_result/confusion_matrices_combined.png` | Confusion matrix (SRR + ERR + ComBat) |
-| `10_result/roc_curves.png` | ROC curve (SRR only) |
-| `10_result/roc_curves_combined.png` | ROC curve (SRR + ERR + ComBat) |
+| [interpretable_if_else_rules.md](file:///mnt/c/Users/User/OneDrive/Documents/GitHub/rna_ai_builder/11_result/interpretable_if_else_rules.md) | รายงานผลลัพธ์กฎ If-Else แบบยีนเด่น |
+| [complete_error_analysis_report.md](file:///mnt/c/Users/User/OneDrive/Documents/GitHub/rna_ai_builder/11_result/complete_error_analysis_report.md) | รายงานการวิเคราะห์ตัวอย่างที่ทำนายผิดพลาด |
+| [y_scrambling_report_leakfree.md](file:///mnt/c/Users/User/OneDrive/Documents/GitHub/rna_ai_builder/11_result/y_scrambling_report_leakfree.md) | รายงานผลการสลับสลากเดาสุ่มแบบไร้รอยรั่ว |
+| [experimental_timeline.md](file:///mnt/c/Users/User/OneDrive/Documents/GitHub/rna_ai_builder/11_result/experimental_timeline.md) | บันทึกประวัติและระยะเวลาการทดลองหลัก |
+| [pipeline_timeline.md](file:///mnt/c/Users/User/OneDrive/Documents/GitHub/rna_ai_builder/11_result/pipeline_timeline.md) | แผนภาพและสถาปัตยกรรมข้อมูลทางเทคนิคของโมเดล |
+
+และรูปภาพสรุปประสิทธิภาพของโมเดลต่างๆ รวมถึงกราฟ ROC Curves ในแต่ละการทดลอง
 
 ---
 

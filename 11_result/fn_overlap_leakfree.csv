@@ -1,0 +1,10 @@
+,Rule 1 - 1 Exon,Rule 2 - 3 Exons,SVM (RBF) - 5k Exons,XGBoost - 5k Exons,Random Forest - 5k Exons,SVM (RBF) - 3 Exons,XGBoost - 3 Exons,Random Forest - 3 Exons,Decision Tree - 3 Exons
+Rule 1 - 1 Exon,15.0,4.0,3.0,2.0,3.0,2.0,3.0,2.0,6.0
+Rule 2 - 3 Exons,4.0,5.0,3.0,1.0,2.0,2.0,2.0,2.0,1.0
+SVM (RBF) - 5k Exons,3.0,3.0,5.0,3.0,4.0,4.0,4.0,4.0,3.0
+XGBoost - 5k Exons,2.0,1.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0
+Random Forest - 5k Exons,3.0,2.0,4.0,3.0,5.0,3.0,3.0,3.0,3.0
+SVM (RBF) - 3 Exons,2.0,2.0,4.0,3.0,3.0,4.0,4.0,4.0,3.0
+XGBoost - 3 Exons,3.0,2.0,4.0,3.0,3.0,4.0,5.0,4.0,4.0
+Random Forest - 3 Exons,2.0,2.0,4.0,3.0,3.0,4.0,4.0,4.0,3.0
+Decision Tree - 3 Exons,6.0,1.0,3.0,3.0,3.0,3.0,4.0,3.0,7.0

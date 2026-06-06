@@ -1,0 +1,4 @@
+experiment,model,accuracy,f1,auc_roc
+PipelineA_kmer,Random Forest,0.8529,0.8673,0.9154
+PipelineA_kmer,XGBoost,0.8431,0.8596,0.9173
+PipelineA_kmer,SVM (RBF),0.7745,0.8099,0.8634

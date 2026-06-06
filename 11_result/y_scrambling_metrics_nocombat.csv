@@ -1,0 +1,6 @@
+Model,Baseline Acc,Scrambled Mean,Scrambled Max,Empirical P-value,Verdict
+Rule 2 (3 Exons),0.8155,0.5107,0.6214,0.0196,GENUINE SIGNAL (Safe)
+SVM (RBF) - 3 Exons,0.9612,0.5029,0.6311,0.0196,GENUINE SIGNAL (Safe)
+SVM (RBF) - 5k Exons,0.9612,0.5029,0.6311,0.0196,GENUINE SIGNAL (Safe)
+XGBoost - 3 Exons,0.9223,0.485,0.6214,0.0196,GENUINE SIGNAL (Safe)
+Random Forest - 3 Exons,0.932,0.5016,0.6117,0.0196,GENUINE SIGNAL (Safe)

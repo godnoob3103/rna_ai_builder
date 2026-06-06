@@ -2,11 +2,11 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 
-COUNTS_DIR = Path("A:/data sci/data/counts")
-MATRIX_FILE = COUNTS_DIR / "combined_exon_matrix.csv"
-LABELS_FILE = COUNTS_DIR / "combined_labels.csv"
-OUT_MATRIX = COUNTS_DIR / "srr_matrix_filtered.csv"
-OUT_LABELS = COUNTS_DIR / "srr_labels_filtered.csv"
+COUNTS_DIR  = Path("A:/data sci/data/counts")
+MATRIX_FILE = COUNTS_DIR / "matrices" / "combined_exon_matrix.csv"
+LABELS_FILE = COUNTS_DIR / "matrices" / "combined_labels.csv"
+OUT_MATRIX  = COUNTS_DIR / "exp1_srr_only" / "features.csv"
+OUT_LABELS  = COUNTS_DIR / "exp1_srr_only" / "labels.csv"
 
 MIN_SAMPLE_FRAC = 0.10
 TOP_N_EXONS = 5000

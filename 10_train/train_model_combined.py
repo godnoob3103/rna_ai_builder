@@ -10,11 +10,12 @@ from sklearn.model_selection import LeaveOneOut
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, confusion_matrix, roc_curve
 from xgboost import XGBClassifier
 
-COUNTS_DIR = Path("A:/data sci/data/counts")
+COUNTS_DIR  = Path("A:/data sci/data/counts")
+OUT_METRICS = COUNTS_DIR / "results" / "metrics.csv"
 
 DATASETS = {
-    "Step1_SRR":       (COUNTS_DIR / "srr_matrix_filtered.csv",    COUNTS_DIR / "srr_labels_filtered.csv"),
-    "Step2_Combined":  (COUNTS_DIR / "combined_matrix_combat.csv", COUNTS_DIR / "combined_labels_103.csv"),
+    "Step1_SRR":       (COUNTS_DIR / "exp1_srr_only" / "features.csv",      COUNTS_DIR / "exp1_srr_only" / "labels.csv"),
+    "Step2_Combined":  (COUNTS_DIR / "exp2_combined_combat" / "features.csv", COUNTS_DIR / "exp2_combined_combat" / "labels.csv"),
 }
 
 MODELS = [
@@ -100,7 +101,7 @@ def plot_all(all_results):
             fig.colorbar(im, ax=ax, fraction=0.046)
     plt.suptitle("Confusion Matrices — Step1 vs Step2", fontsize=13)
     plt.tight_layout()
-    path = COUNTS_DIR / "confusion_matrices_combined.png"
+    path = COUNTS_DIR / "results" / "confusion_matrices_combined.png"
     plt.savefig(path, dpi=150); plt.close()
     print(f"Saved: {path}")
 
@@ -118,7 +119,7 @@ def plot_all(all_results):
         ax.set_title(f"ROC — {tag_short[tag].replace(chr(10), ' ')}")
         ax.legend(loc="lower right", fontsize=9)
     plt.tight_layout()
-    path = COUNTS_DIR / "roc_curves_combined.png"
+    path = COUNTS_DIR / "results" / "roc_curves_combined.png"
     plt.savefig(path, dpi=150); plt.close()
     print(f"Saved: {path}")
 
@@ -143,6 +144,21 @@ def print_comparison(all_results):
             print(f"  {model_name:<20}  {v1:>12.4f}  {v2:>16.4f}  {sign}{diff:>7.4f}")
 
 
+def save_metrics(all_results):
+    rows = []
+    for exp, res in all_results.items():
+        for name, m in res.items():
+            rows.append({
+                "experiment": exp,
+                "model":      name,
+                "accuracy":   round(m["acc"], 4),
+                "f1":         round(m["f1"],  4),
+                "auc_roc":    round(m["auc"], 4),
+            })
+    pd.DataFrame(rows).to_csv(OUT_METRICS, index=False)
+    print(f"Saved: {OUT_METRICS}")
+
+
 def main():
     all_results = {}
     for tag, (matrix_path, labels_path) in DATASETS.items():
@@ -152,6 +168,7 @@ def main():
 
     print("\nSaving plots ...")
     plot_all(all_results)
+    save_metrics(all_results)
     print("\nDone.")
 
 

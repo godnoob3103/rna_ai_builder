@@ -1,0 +1,6 @@
+,Rule 1,Rule 2,Random Forest,XGBoost,SVM (RBF)
+Rule 1,2.0,0.0,0.0,1.0,0.0
+Rule 2,0.0,1.0,0.0,0.0,0.0
+Random Forest,0.0,0.0,3.0,0.0,0.0
+XGBoost,1.0,0.0,0.0,2.0,0.0
+SVM (RBF),0.0,0.0,0.0,0.0,0.0

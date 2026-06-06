@@ -61,6 +61,4 @@ for sample in ERR164476 ERR164479 ERR164480 ERR164484 ERR164487 ERR164491 ERR164
 done
 
 echo "===== ALL DONE ====="
-EOF
 
-chmod +x ~/run_pipeline.sh

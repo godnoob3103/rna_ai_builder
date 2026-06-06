@@ -1,0 +1,7 @@
+experiment,model,accuracy,f1,auc_roc
+Exp1_SRR_Only,Random Forest,0.9518,0.9565,0.9716
+Exp1_SRR_Only,XGBoost,0.9398,0.9474,0.9894
+Exp1_SRR_Only,SVM (RBF),0.9398,0.9451,0.9781
+Exp2_Combined_ComBat,Random Forest,0.9314,0.9369,0.9645
+Exp2_Combined_ComBat,XGBoost,0.9412,0.9464,0.9884
+Exp2_Combined_ComBat,SVM (RBF),0.9510,0.9533,0.9720

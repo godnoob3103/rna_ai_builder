@@ -1,0 +1,7 @@
+pipeline,model,accuracy,f1,auc
+A (DL),CNN,0.5588,0.6763,0.245
+A (DL),LSTM,0.5588,0.6763,0.1828
+A (DL),Transformer,0.5294,0.6471,0.4887
+B (ML),Random Forest,,,0.931
+B (ML),XGBoost,,,0.941
+B (ML),SVM (RBF),,,0.951

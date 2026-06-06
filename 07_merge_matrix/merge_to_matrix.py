@@ -56,4 +56,3 @@ print(f"\nMatrix shape: {matrix.T.shape}")
 print(f"Cancer samples: {sum(v==1 for v in labels.values())}")
 print(f"Non-cancer samples: {sum(v==0 for v in labels.values())}")
 print("Saved: exon_matrix.csv and labels.csv")
-EOF

@@ -1,4 +1,4 @@
-import numpy as np # อันนี้ cluster เพื่อดู batch ffect (ERR + SRR)
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -8,11 +8,11 @@ from sklearn.preprocessing import StandardScaler
 from pycombat import Combat
 
 COUNTS_DIR   = Path("A:/data sci/data/counts")
-MATRIX_FILE  = COUNTS_DIR / "combined_exon_matrix.csv"
-LABELS_FILE  = COUNTS_DIR / "combined_labels.csv"
-OUT_MATRIX   = COUNTS_DIR / "combined_matrix_combat.csv"
-OUT_LABELS   = COUNTS_DIR / "combined_labels_103.csv"
-OUT_PCA      = COUNTS_DIR / "pca_batch_effect.png"
+MATRIX_FILE  = COUNTS_DIR / "matrices" / "combined_exon_matrix.csv"
+LABELS_FILE  = COUNTS_DIR / "matrices" / "combined_labels.csv"
+OUT_MATRIX   = COUNTS_DIR / "exp2_combined_combat" / "features.csv"
+OUT_LABELS   = COUNTS_DIR / "exp2_combined_combat" / "labels.csv"
+OUT_PCA      = COUNTS_DIR / "results" / "pca_batch_effect.png"
 
 MIN_SAMPLE_FRAC = 0.10
 TOP_N_EXONS     = 5000
