@@ -1,0 +1,5 @@
+Model,LOO_CV_Accuracy,CV_8020_Mean_Accuracy,CV_8020_Std_Dev
+Rule 2 (3-Exon),0.8641,0.8546,0.0738
+SVM (RBF),0.9515,0.9410,0.0444
+XGBoost,0.9417,0.9147,0.0630
+Random Forest,0.9223,0.9174,0.0519

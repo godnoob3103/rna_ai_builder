@@ -191,7 +191,7 @@ python3 09_preprocess/preprocess_combined.py
 
 ### Step 10 — Train ML Model
 **โฟลเดอร์:** `10_train/`  
-การเปรียบเทียบเชิงวิจัย 4 เฟสเพื่อสร้างโมเดลที่มีประสิทธิภาพสูงสุดและป้องกันปัญหา Data Leakage
+การเปรียบเทียบเชิงวิจัย 5 เฟสเพื่อสร้างโมเดลที่มีประสิทธิภาพสูงสุดและป้องกันปัญหา Data Leakage
 
 ```bash
 # เทรนเฉพาะ SRR เดี่ยว
@@ -199,13 +199,17 @@ python3 10_train/train_model_only_srr.py
 
 # เทรนโมเดลเปรียบเทียบ SRR vs SRR+ERR แบบมี ComBat
 python3 10_train/train_model_combined.py
+
+# รัน Cross-validation 80:20 (5-Fold, 10 Repeats) แบบ ComBat Inside Loop
+python3 10_train/test_combat_cv8020_real.py
 ```
 
-#### 📅 เส้นทางการวิจัยและทดลอง (4 เฟส)
+#### 📅 เส้นทางการวิจัยและทดลอง (5 เฟส)
 1. **Phase 1: Global Setup** - ทำ ComBat ปรับสเกลข้อมูลทั้งหมดพร้อมกัน ได้ผลประเมิน Rule 2 แม่นยำสูงลิ่วถึง **98.04%**
 2. **Phase 2: Leakage Fix** - พบ Data Leakage ในการปรับสเกล จึงออกแบบ ComBat-CV แยกฟิตเฉพาะข้อมูลในลูป Train (`error_analysis_complete.py`) ส่งผลให้ความแม่นยำ Rule 2 ตกลงมาเหลือ **86.41%** ในขณะที่โมเดล **SVM (RBF) - 3 Exons** นำด้วยความแม่นยำคงที่ **96.12%**
 3. **Phase 3: Y-Scrambling** - ทำการประเมินความนัยสำคัญของผลลัพธ์ (`y_scrambling_leakfree.py`) ได้ Empirical P-value = **0.0196** ยืนยันว่าโมเดลเรียนรู้จากสัญญาณทางชีวภาพจริงที่ปลอดภัยจาก Data Leakage
 4. **Phase 4: Raw Evaluation** - รันโมเดลบนข้อมูลดิบที่ไม่ผ่าน Combat เลย (`y_scrambling_nocombat.py`) พบว่า **SVM (RBF) - 3 Exons** ได้ผลลัพธ์เสถียรที่ **96.12%** เช่นเดิม ทำให้ได้โมเดลแนะนำสำหรับใช้งานทางคลินิก (Inference รวดเร็วแบบไม่ต้องมี ComBat)
+5. **Phase 5: CV Strategy Evaluation** - เปรียบเทียบประสิทธิภาพแบบ 80:20 CV (5-Fold, 10 Repeats) เทียบกับ LOO-CV (`test_combat_cv8020_real.py`) เพื่อดูความเสถียรและส่วนเบี่ยงเบนมาตรฐาน (Std Dev) ภายใต้ขบวนการ ComBat Inside Loop ปราศจาก Data Leakage
 
 *อ่านบันทึกประวัติการทดลองได้ใน [experimental_timeline.md](file:///mnt/c/Users/User/OneDrive/Documents/GitHub/rna_ai_builder/11_result/experimental_timeline.md)*
 
@@ -219,6 +223,7 @@ python3 10_train/train_model_combined.py
 | [interpretable_if_else_rules.md](file:///mnt/c/Users/User/OneDrive/Documents/GitHub/rna_ai_builder/11_result/interpretable_if_else_rules.md) | รายงานผลลัพธ์กฎ If-Else แบบยีนเด่น |
 | [complete_error_analysis_report.md](file:///mnt/c/Users/User/OneDrive/Documents/GitHub/rna_ai_builder/11_result/complete_error_analysis_report.md) | รายงานการวิเคราะห์ตัวอย่างที่ทำนายผิดพลาด |
 | [y_scrambling_report_leakfree.md](file:///mnt/c/Users/User/OneDrive/Documents/GitHub/rna_ai_builder/11_result/y_scrambling_report_leakfree.md) | รายงานผลการสลับสลากเดาสุ่มแบบไร้รอยรั่ว |
+| [combat_cv_comparison_report.md](file:///mnt/c/Users/User/OneDrive/Documents/GitHub/rna_ai_builder/11_result/combat_cv_comparison_report.md) | รายงานการวิเคราะห์เปรียบเทียบ LOO-CV กับ 80:20 CV แบบ ComBat Inside Loop |
 | [experimental_timeline.md](file:///mnt/c/Users/User/OneDrive/Documents/GitHub/rna_ai_builder/11_result/experimental_timeline.md) | บันทึกประวัติและระยะเวลาการทดลองหลัก |
 | [pipeline_timeline.md](file:///mnt/c/Users/User/OneDrive/Documents/GitHub/rna_ai_builder/11_result/pipeline_timeline.md) | แผนภาพและสถาปัตยกรรมข้อมูลทางเทคนิคของโมเดล |
 
