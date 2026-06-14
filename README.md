@@ -1,4 +1,4 @@
-# RNA-seq AI Builder — Cancer Classifier
+# RNA-seq AI Builder — Classifier
 
 Pipeline สำหรับสร้าง ML model จำแนกมะเร็งปอด โดยใช้ข้อมูล RNA-seq ระดับ exon
 รันบน **WSL (Ubuntu)** เพราะ tools ส่วนใหญ่ทำงานบน Linux
